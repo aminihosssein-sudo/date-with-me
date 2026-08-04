@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>یه سوال کوچیک 🌸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink-soft:#ffdbe9;
+    --pink-deep:#ff6fa5;
+    --lilac:#e7dcff;
+    --rosegold:#e0ac9d;
+    --cream:#fff8f8;
+    --ink:#4a2b3a;
+    --glass: rgba(255,255,255,0.55);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;width:100%;height:100%;
+    font-family:'Vazirmatn',sans-serif;
+    background:linear-gradient(160deg,var(--cream) 0%, var(--pink-soft) 45%, var(--lilac) 100%);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  #app{position:relative; min-height:100vh; width:100%; overflow:hidden;}
+
+  #bg-layer{position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;}
+  .floaty{ position:absolute; top:-40px; font-size:22px; opacity:0.55; animation: fall linear infinite; user-select:none; }
+  @keyframes fall{ 0%{ transform: translateY(-10vh) rotate(0deg); } 100%{ transform: translateY(110vh) rotate(360deg); } }
+
+  /* Top nav (back / home) */
+  .topnav{
+    position:fixed; top:0; right:0; left:0; z-index:30;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 16px; pointer-events:none;
+  }
+  .nav-btn{
+    pointer-events:auto;
+    background:var(--glass); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.7); color:var(--ink);
+    font-family:inherit; font-weight:600; font-size:13px;
+    padding:9px 16px; border-radius:999px; cursor:pointer;
+    box-shadow:0 6px 16px rgba(180,90,130,0.15);
+    transition: transform .2s ease;
+    display:flex; align-items:center; gap:6px;
+  }
+  .nav-btn:hover{ transform: translateY(-2px); }
+  .nav-btn.hidden{ visibility:hidden; }
+
+  .page{
+    position:relative; z-index:1;
+    min-height:100vh; width:100%;
+    display:none;
+    flex-direction:column; align-items:center; justify-content:center;
+    padding:78px 18px 60px;
+    text-align:center;
+  }
+  .page.active{display:flex;}
+  .page.enter{animation: pageIn .5s cubic-bezier(.2,.9,.25,1) both;}
+  @keyframes pageIn{ from{opacity:0; transform: scale(.95) translateY(16px);} to{opacity:1; transform: scale(1) translateY(0);} }
+
+  .eyebrow{font-size:14px; color:var(--pink-deep); letter-spacing:.05em; margin-bottom:6px; font-weight:600;}
+
+  h1.hero{ font-size:clamp(26px,6.5vw,46px); font-weight:800; margin:0 0 10px; color:var(--ink); text-shadow: 0 2px 18px rgba(255,111,165,0.25); }
+  p.sub{ font-size:clamp(14px,3.2vw,17px); color:#7a5468; margin:0 0 30px; max-width:440px; }
+
+  .btn-row{display:flex; gap:18px; align-items:center; justify-content:center; flex-wrap:wrap; position:relative; min-height:90px;}
+
+  .btn{ border:none; cursor:pointer; border-radius:999px; font-family:inherit; font-weight:700;
+    transition: transform .35s cubic-bezier(.2,.9,.25,1), font-size .35s ease, padding .35s ease, opacity .35s ease, box-shadow .3s ease;
+    position:relative; overflow:hidden; }
+  .btn-yes{ background: linear-gradient(135deg,#ff8fb8,var(--pink-deep)); color:#fff; font-size:20px; padding:16px 40px; box-shadow: 0 10px 28px rgba(255,111,165,0.45); }
+  .btn-yes:hover{ transform: translateY(-3px) scale(1.03); box-shadow:0 14px 34px rgba(255,111,165,0.55); }
+  .btn-no{ background:#f3e8ee; color:#9c7a8a; font-size:16px; padding:12px 26px; box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
+  .btn-no:hover{ transform: translateY(-2px); }
+
+  .ripple{position:absolute; border-radius:50%; background:rgba(255,255,255,0.6); transform:scale(0); animation:rip .6s ease-out; pointer-events:none;}
+  @keyframes rip{ to{ transform:scale(3.2); opacity:0; } }
+
+  .taunt{ margin-top:22px; font-size:15px; color:var(--pink-deep); font-weight:600; min-height:24px; }
+  .taunt.show{ animation: popfade .5s cubic-bezier(.2,.9,.25,1) both; }
+  @keyframes popfade{ 0%{opacity:0; transform: scale(.6);} 60%{opacity:1; transform: scale(1.08);} 100%{opacity:1; transform: scale(1);} }
+
+  .glass-card{ background:var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border:1px solid rgba(255,255,255,0.6); border-radius:24px; padding:28px 26px;
+    box-shadow: 0 12px 34px rgba(180,90,130,0.18); max-width:420px; width:100%; }
+
+  .field{margin-bottom:18px; text-align:right;}
+  .field label{display:block; font-size:14px; color:#8a6072; margin-bottom:8px; font-weight:600;}
+  .field input{ width:100%; padding:14px 16px; border-radius:16px; border:1px solid rgba(255,255,255,0.8);
+    background:rgba(255,255,255,0.75); font-family:inherit; font-size:15px; color:var(--ink); outline:none;
+    transition: box-shadow .25s ease, border-color .25s ease; }
+  .field input:focus{ border-color:var(--pink-deep); box-shadow:0 0 0 4px rgba(255,111,165,0.18); }
+
+  .btn-continue{ margin-top:6px; width:100%; background:linear-gradient(135deg,#ff8fb8,var(--pink-deep)); color:#fff;
+    font-size:17px; padding:14px 20px; border:none; border-radius:16px; font-family:inherit; font-weight:700; cursor:pointer;
+    box-shadow:0 10px 24px rgba(255,111,165,0.4); transition: transform .25s ease, opacity .25s ease; }
+  .btn-continue:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn-continue:not(:disabled):hover{ transform: translateY(-2px); }
+
+  .option-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(128px,1fr)); gap:14px; max-width:560px; width:100%; margin-bottom:26px; }
+  .option-card{ position:relative; background:rgba(255,255,255,0.7); border:2px solid transparent; border-radius:18px;
+    padding:18px 10px 14px; cursor:pointer; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    box-shadow:0 6px 16px rgba(180,90,130,0.12); display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .option-card:hover{ transform: translateY(-4px) scale(1.03); box-shadow:0 10px 22px rgba(180,90,130,0.22); }
+  .option-card.selected{ border-color:var(--pink-deep); background:rgba(255,219,233,0.85); transform: translateY(-3px);
+    box-shadow:0 0 0 4px rgba(255,111,165,0.18), 0 10px 22px rgba(180,90,130,0.25); }
+  .option-emoji{font-size:32px;}
+  .option-name{font-size:13px; font-weight:600; color:#7a5468;}
+  .option-desc{font-size:11px; color:#a785a0; margin-top:-2px;}
+  .check-badge{ position:absolute; top:6px; left:6px; background:var(--pink-deep); color:#fff; width:20px; height:20px;
+    border-radius:50%; font-size:12px; display:flex; align-items:center; justify-content:center;
+    opacity:0; transform:scale(.4); transition: all .3s cubic-bezier(.2,.9,.25,1); }
+  .option-card.selected .check-badge{ opacity:1; transform:scale(1); }
+
+  .btn-final{ background:linear-gradient(135deg,#ff8fb8,var(--pink-deep)); color:#fff; font-size:18px; padding:15px 38px;
+    border:none; border-radius:999px; font-family:inherit; font-weight:700; cursor:pointer;
+    box-shadow:0 10px 26px rgba(255,111,165,0.4); transition: transform .25s ease; }
+  .btn-final:not(:disabled):hover{ transform: translateY(-2px); }
+  .btn-final:disabled{ opacity:.45; cursor:not-allowed; }
+
+  .confetti-piece{ position:fixed; top:-20px; z-index:20; pointer-events:none; font-size:20px; }
+  @keyframes confettiFall{ 0%{ transform: translateY(-10vh) rotate(0deg); opacity:1;} 100%{ transform: translateY(110vh) rotate(600deg); opacity:0.9;} }
+
+  .result-box{ background:var(--glass); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,0.6); border-radius:24px; padding:30px 26px; max-width:460px; width:100%;
+    box-shadow:0 14px 36px rgba(180,90,130,0.2); margin-top:10px; }
+  .result-box p{ margin:6px 0; font-size:16px; line-height:1.9; }
+  .result-highlight{ color:var(--pink-deep); font-weight:800; }
+
+  .car-img{ margin-top:22px; max-width:240px; width:65%; filter:drop-shadow(0 10px 18px rgba(180,90,130,0.3)); }
+
+  .dots{ display:flex; gap:8px; margin-bottom:22px; }
+  .dot{ width:8px; height:8px; border-radius:50%; background:rgba(180,90,130,0.25); transition: background .3s ease; }
+  .dot.active{ background:var(--pink-deep); }
+
+  .final-actions{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:24px; }
+  .btn-ghost{ background:rgba(255,255,255,0.7); color:var(--ink); border:1px solid rgba(255,255,255,0.8);
+    font-family:inherit; font-weight:600; font-size:14px; padding:11px 18px; border-radius:999px; cursor:pointer;
+    box-shadow:0 6px 16px rgba(180,90,130,0.12); transition: transform .2s ease; }
+  .btn-ghost:hover{ transform: translateY(-2px); }
+
+  .modal-overlay{ position:fixed; inset:0; background:rgba(74,43,58,0.35); backdrop-filter:blur(4px);
+    display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;
+    animation: fadeIn .25s ease both; }
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+  .modal-box{ background:#fff; border-radius:22px; padding:26px 24px; max-width:340px; width:100%; text-align:center;
+    box-shadow:0 20px 50px rgba(90,40,60,0.3); animation: pageIn .3s cubic-bezier(.2,.9,.25,1) both; }
+  .modal-box p{ font-size:15px; color:var(--ink); line-height:1.8; margin:0 0 20px; }
+  .modal-actions{ display:flex; gap:10px; }
+  .modal-actions button{ flex:1; padding:12px; border-radius:14px; border:none; font-family:inherit; font-weight:700;
+    font-size:14px; cursor:pointer; }
+  .modal-cancel{ background:#f3e8ee; color:#8a6072; }
+  .modal-confirm{ background:linear-gradient(135deg,#ff8fb8,var(--pink-deep)); color:#fff; }
+
+  .admin-panel{ position:relative; z-index:1; max-width:520px; margin:60px auto; padding:24px; }
+  .admin-panel table{ width:100%; border-collapse:collapse; background:rgba(255,255,255,0.7); border-radius:14px; overflow:hidden; }
+  .admin-panel th,.admin-panel td{ padding:10px; font-size:13px; border-bottom:1px solid rgba(180,90,130,0.15); text-align:right; }
+
+  @media (max-width:380px){
+    .btn-yes{padding:14px 30px; font-size:18px;}
+    .btn-no{padding:10px 20px; font-size:14px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="bg-layer"></div>
+<div class="topnav">
+  <button id="homeBtn" class="nav-btn">🏠 خانه</button>
+  <button id="backBtn" class="nav-btn">➜ بازگشت</button>
+</div>
+<div id="app"></div>
+
+<script>
+/* =========================================================================
+   CONFIG — همه‌ی متن‌ها، فعالیت‌ها و گزینه‌ها اینجا تعریف میشن.
+   برای اضافه کردن فعالیت جدید، فقط یک آبجکت به آرایه ACTIVITIES اضافه کن.
+   ========================================================================= */
+const CONFIG = {
+  storageKey: 'invite-response-v2',
+  maxNoStage: 4,
+  taunts: [
+    '🥺 مطمئنی؟',
+    'یه بار دیگه فکر کن...',
+    'قول میدم خوش بگذره... 🍕',
+    'دیگه نه‌ای وجود نداره...<br>فقط آره مونده ❤️'
+  ],
+  ACTIVITIES: [
+    { id:'restaurant', emoji:'🍽️', label:'رستوران', desc:'یه شام دونفره',
+      sub:{ title:'دوست داری چی بخوریم؟ 🍽️', options:[
+        {emoji:'🍕',label:'پیتزا'},{emoji:'🍔',label:'برگر'},
+        {emoji:'🍝',label:'پاستا'},{emoji:'🍗',label:'سوخاری'},
+        {emoji:'🥙',label:'ساندویچ'},{emoji:'🥗',label:'سالاد'},
+        {emoji:'🍛',label:'خورش'},{emoji:'🍰',label:'کیک'} ]},
+      finalPhrase:(s)=>`بریم رستوران و با هم ${s?s.emoji+' '+s.label:'یه غذای خوب'} بخوریم.` },
+
+    { id:'cafe', emoji:'☕', label:'کافه', desc:'گپ و گفت آروم',
+      sub:{ title:'چی دوست داری سفارش بدیم؟ ☕', options:[
+        {emoji:'☕',label:'قهوه'},{emoji:'🧊',label:'آیس‌لاته'},{emoji:'☕',label:'کاپوچینو'},
+        {emoji:'🍫',label:'هات‌چاکلت'},{emoji:'🍰',label:'چیزکیک'},{emoji:'🧁',label:'براونی'},
+        {emoji:'🍦',label:'بستنی'},{emoji:'🥤',label:'میلک‌شیک'} ]},
+      finalPhrase:(s)=>`بریم کافه و با هم ${s?s.emoji+' '+s.label:'یه چیز خوشمزه'} بخوریم.` },
+
+    { id:'boardgame', emoji:'🎲', label:'کافه بردگیم', desc:'رقابت دونفره',
+      sub:{ title:'کدوم بازی رو بازی کنیم؟ 🎲', options:[
+        {emoji:'🎲',label:'UNO'},{emoji:'🕵️',label:'Mafia'},{emoji:'🏝️',label:'Catan'},
+        {emoji:'💣',label:'Exploding Kittens'},{emoji:'🗡️',label:'Avalon'},{emoji:'🚂',label:'Ticket To Ride'} ]},
+      finalPhrase:(s)=>`بریم کافه بردگیم و ${s?s.label+' '+s.emoji:'یه بازی خوب'} بازی کنیم.` },
+
+    { id:'cinema', emoji:'🎬', label:'سینما', desc:'یه فیلم خوب',
+      sub:{ title:'چه ژانری دوست داری؟ 🎬', options:[
+        {emoji:'💥',label:'اکشن'},{emoji:'😂',label:'کمدی'},{emoji:'💕',label:'عاشقانه'},
+        {emoji:'👻',label:'ترسناک'},{emoji:'🚀',label:'علمی‌تخیلی'},{emoji:'🎨',label:'انیمیشن'} ]},
+      finalPhrase:(s)=>`بریم سینما و یه فیلم ${s?s.label+' '+s.emoji:''} ببینیم.` },
+
+    { id:'theater', emoji:'🎭', label:'تئاتر', desc:'یه شب هنری', sub:null,
+      finalPhrase:()=>`بریم یه تئاتر خوب ببینیم. 🎭` },
+
+    { id:'cycling', emoji:'🚲', label:'دوچرخه‌سواری', desc:'هوای آزاد', sub:null,
+      finalPhrase:()=>`با هم دوچرخه‌سواری کنیم. 🚲` },
+
+    { id:'walk', emoji:'🚶', label:'پیاده‌روی', desc:'قدم زدن و حرف زدن', sub:null,
+      finalPhrase:()=>`یه پیاده‌روی خوب با هم داشته باشیم. 🚶‍♀️` },
+
+    { id:'boat', emoji:'🛶', label:'قایق‌سواری', desc:'یه چیز متفاوت', sub:null,
+      finalPhrase:()=>`با هم قایق‌سواری کنیم. 🛶` },
+
+    { id:'amusement', emoji:'🎡', label:'شهربازی', desc:'هیجان و خنده', sub:null,
+      finalPhrase:()=>`بریم شهربازی و حسابی خوش بگذرونیم. 🎡` },
+
+    { id:'bowling', emoji:'🎳', label:'بولینگ', desc:'رقابت و خنده', sub:null,
+      finalPhrase:()=>`بریم بولینگ بازی کنیم. 🎳` },
+
+    { id:'billiard', emoji:'🎯', label:'بیلیارد', desc:'یه بازی آروم', sub:null,
+      finalPhrase:()=>`بریم بیلیارد بازی کنیم. 🎯` },
+
+    { id:'escape', emoji:'🧩', label:'اتاق فرار', desc:'هیجان و معما',
+      sub:{ title:'کدوم تم رو دوست داری؟ 🧩', options:[
+        {emoji:'👻',label:'ترسناک'},{emoji:'🧩',label:'معمایی'},{emoji:'🗺️',label:'ماجراجویی'},{emoji:'⚡',label:'هیجانی'} ]},
+      finalPhrase:(s)=>`بریم اتاق فرار با تم ${s?s.label+' '+s.emoji:''}.` },
+
+    { id:'mall', emoji:'🛍️', label:'پاساژگردی', desc:'خرید و گشت‌وگذار', sub:null,
+      finalPhrase:()=>`بریم پاساژگردی و خرید. 🛍️` },
+
+    { id:'park', emoji:'🌳', label:'پارک', desc:'هوای تازه', sub:null,
+      finalPhrase:()=>`بریم پارک و یه وقت خوب بگذرونیم. 🌳` },
+
+    { id:'sunset', emoji:'🌅', label:'غروب‌گردی', desc:'یه لحظه آروم', sub:null,
+      finalPhrase:()=>`بریم غروب‌گردی. 🌅` },
+
+    { id:'nature', emoji:'🏞️', label:'طبیعت‌گردی', desc:'دور از شلوغی', sub:null,
+      finalPhrase:()=>`بریم طبیعت‌گردی. 🏞️` },
+
+    { id:'concert', emoji:'🎤', label:'کنسرت', desc:'موسیقی زنده', sub:null,
+      finalPhrase:()=>`بریم کنسرت. 🎤` },
+
+    { id:'gallery', emoji:'🎨', label:'گالری هنری', desc:'یه گشت هنری', sub:null,
+      finalPhrase:()=>`بریم گالری هنری. 🎨` },
+
+    { id:'bookstore', emoji:'📚', label:'کتاب‌فروشی و کافه', desc:'آرامش و کتاب', sub:null,
+      finalPhrase:()=>`بریم کتاب‌فروشی و کافه. 📚` },
+
+    { id:'gamenet', emoji:'🎮', label:'گیم‌نت', desc:'رقابت گیمری', sub:null,
+      finalPhrase:()=>`بریم گیم‌نت و بازی کنیم. 🎮` }
+  ]
+};
+
+/* ---------------- Telegram + notify (اختیاری) ---------------- */
+const NOTIFY_EMAIL = '';
+const NOTIFY_PHONE = '';
+// مقادیر پیش‌فرض (برای خودت). اگه لینک شامل ?tg_token= و ?tg_chat= باشه، همون‌ها اولویت دارن —
+// این یعنی هر کسی می‌تونه با یه لینک متفاوت، ربات خودش رو استفاده کنه بدون دست‌زدن به کد.
+const _urlParams = new URLSearchParams(location.search);
+const TG_BOT_TOKEN = _urlParams.get('tg_token') || '8717125736:AAERm_VK2khj52wyrD8ERuhRDmcs19s3KKw';
+const TG_CHAT_ID = _urlParams.get('tg_chat') || '266716153';
+
+/* ---------------- شخصی‌سازی (اسم طرف مقابل) ----------------
+   اسم از پارامتر لینک (?name=...) خونده می‌شه، پس هر نفر لینک مخصوص خودش رو داره
+   و لینک قبلی‌ای که به یکی دادی، همیشه همون اسم رو نشون می‌ده — حتی اگه بعداً
+   برای یه نفر دیگه از همین فایل استفاده کنی.
+   مثال لینک برای سارا: index.html?name=سارا
+   اگه پارامتر لینک نبود، مقدار پیش‌فرض زیر استفاده می‌شه (می‌تونی خالی بذاریش). */
+const PARTNER_NAME = _urlParams.get('name') || '';
+
+/* ---------------- Persian calendar helpers ---------------- */
+const persianMonths = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const persianWeekdays = ['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه']; // index = JS getDay()
+const persianDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+function toPersianDigits(str){ return String(str).replace(/[0-9]/g, d => persianDigits[+d]); }
+function div(a,b){ return ~~(a/b); }
+function gregorianToJalali(gy, gm, gd){
+  const g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
+  let jy = (gy<=1600) ? 0 : 979;
+  gy -= (gy<=1600) ? 621 : 1600;
+  const gy2 = (gm>2) ? (gy+1) : gy;
+  let days = (365*gy) + div((gy2+3),4) - div((gy2+99),100) + div((gy2+399),400) - 80 + gd + g_d_m[gm-1];
+  jy += 33 * div(days,12053); days %= 12053;
+  jy += 4 * div(days,1461); days %= 1461;
+  if(days > 365){ jy += div(days-1,365); days = (days-1) % 365; }
+  let jm, jd;
+  if(days < 186){ jm = 1 + div(days,31); jd = 1 + (days % 31); }
+  else { jm = 7 + div(days-186,30); jd = 1 + ((days-186) % 30); }
+  return [jy, jm, jd];
+}
+function jalaliDateParts(d){
+  if(!d) return null;
+  const [gy,gm,gd] = d.split('-').map(Number);
+  const [jy,jm,jd] = gregorianToJalali(gy,gm,gd);
+  return { jy, jm, jd, weekday: persianWeekdays[new Date(gy,gm-1,gd).getDay()] };
+}
+function formatDateFull(d){
+  const p = jalaliDateParts(d);
+  if(!p) return '';
+  return `${toPersianDigits(p.jd)} ${persianMonths[p.jm-1]} ${toPersianDigits(p.jy)}`;
+}
+function formatDateWithWeekday(d){
+  const p = jalaliDateParts(d);
+  if(!p) return '';
+  return `${p.weekday} ${toPersianDigits(p.jd)} ${persianMonths[p.jm-1]}`;
+}
+
+/* ---------------- State ---------------- */
+function freshState(){
+  return { step:'ask', history:[], noStage:0, date:'', time:'', activityId:'', subChoice:null, telegramSent:false };
+}
+let state = freshState();
+
+async function restoreState(){
+  try{
+    const raw = localStorage.getItem(CONFIG.storageKey);
+    if(raw) Object.assign(state, JSON.parse(raw));
+  }catch(e){}
+}
+function persistState(){
+  try{ localStorage.setItem(CONFIG.storageKey, JSON.stringify(state)); }catch(e){}
+}
+async function persistShared(){
+  if(!window.storage) return;
+  try{
+    await window.storage.set('response:'+CONFIG.storageKey, JSON.stringify({
+      date: state.date, time: state.time,
+      activity: getActivity()?.label || '', sub: state.subChoice?.label || '',
+      savedAt: new Date().toISOString()
+    }), true);
+  }catch(e){}
+}
+
+function getActivity(){ return CONFIG.ACTIVITIES.find(a=>a.id===state.activityId); }
+
+/* ---------------- Navigation ---------------- */
+function goTo(step){
+  state.history.push(state.step);
+  state.step = step;
+  persistState();
+  render();
+}
+function goBack(){
+  if(!state.history.length) return;
+  state.step = state.history.pop();
+  persistState();
+  render();
+}
+function fullReset(){
+  state = freshState();
+  try{ localStorage.removeItem(CONFIG.storageKey); }catch(e){}
+  render();
+}
+function newDateKeepYes(){
+  const kept = { step:'date', history:['ask'], noStage: state.noStage, date:'', time:'', activityId:'', subChoice:null, telegramSent:false };
+  state = kept;
+  persistState();
+  render();
+}
+
+/* ---------------- Home confirm modal ---------------- */
+function showModal({text, confirmLabel, onConfirm}){
+  const overlay = document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box">
+      <p>${text}</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="modalCancel">ادامه</button>
+        <button class="modal-confirm" id="modalConfirm">${confirmLabel}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#modalCancel').addEventListener('click', ()=> overlay.remove());
+  overlay.querySelector('#modalConfirm').addEventListener('click', ()=>{ overlay.remove(); onConfirm(); });
+}
+
+function setupTopNav(){
+  const homeBtn = document.getElementById('homeBtn');
+  const backBtn = document.getElementById('backBtn');
+  backBtn.classList.toggle('hidden', state.history.length===0);
+  homeBtn.onclick = ()=>{
+    if(state.step==='ask'){ return; }
+    const hasData = state.date || state.time || state.activityId;
+    if(hasData){
+      showModal({
+        text:'اگر به صفحه اصلی برگردی، اطلاعات این قرار پاک می‌شه. مطمئنی؟',
+        confirmLabel:'بازگشت به خانه',
+        onConfirm: fullReset
+      });
+    } else {
+      fullReset();
+    }
+  };
+  backBtn.onclick = ()=> goBack();
+}
+
+/* ---------------- Ripple ---------------- */
+function ripple(e, btn){
+  const r = document.createElement('span');
+  r.className='ripple';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.width = r.style.height = size+'px';
+  r.style.left = (e.clientX - rect.left - size/2)+'px';
+  r.style.top = (e.clientY - rect.top - size/2)+'px';
+  btn.appendChild(r);
+  setTimeout(()=>r.remove(), 650);
+}
+
+/* ---------------- Background floaties ---------------- */
+const bgLayer = document.getElementById('bg-layer');
+const floatSymbols = ['💗','🌸','🤍','💕','🌷'];
+function spawnFloaty(){
+  const el = document.createElement('div');
+  el.className='floaty';
+  el.textContent = floatSymbols[Math.floor(Math.random()*floatSymbols.length)];
+  el.style.left = Math.random()*100+'vw';
+  const duration = 9 + Math.random()*8;
+  el.style.animationDuration = duration+'s';
+  el.style.fontSize = (14 + Math.random()*18)+'px';
+  bgLayer.appendChild(el);
+  setTimeout(()=>el.remove(), duration*1000+500);
+}
+setInterval(spawnFloaty, 700);
+for(let i=0;i<8;i++) setTimeout(spawnFloaty, i*300);
+
+/* ---------------- Confetti ---------------- */
+function launchConfetti(){
+  const symbols = ['🎉','💗','🌸','🎀','✨','💕'];
+  for(let i=0;i<40;i++){
+    setTimeout(()=>{
+      const el = document.createElement('div');
+      el.className='confetti-piece';
+      el.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+      el.style.left = Math.random()*100+'vw';
+      const dur = 2.5+Math.random()*2;
+      el.style.animation = `confettiFall ${dur}s ease-in forwards`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(), dur*1000+200);
+    }, i*40);
+  }
+}
+
+/* ---------------- Telegram ---------------- */
+async function sendTelegramNotification(){
+  if(!TG_BOT_TOKEN || !TG_CHAT_ID) return;
+  const activity = getActivity();
+  const phrase = activity ? activity.finalPhrase(state.subChoice) : '';
+  const text = `❤️ جواب قرار رسید!\nتاریخ: ${formatDateWithWeekday(state.date)}\nساعت: ${toPersianDigits(state.time)}\n${phrase}`;
+  try{
+    await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ chat_id: TG_CHAT_ID, text })
+    });
+    state.telegramSent = true;
+    persistState();
+  }catch(e){}
+}
+
+/* =========================================================================
+   RENDER — هر مرحله یک تابع render مستقل داره
+   ========================================================================= */
+const app = document.getElementById('app');
+
+function render(){
+  setupTopNav();
+  const renderers = {
+    ask: renderAsk, date: renderDate, time: renderTime,
+    activity: renderActivity, sub: renderSub, final: renderFinal
+  };
+  (renderers[state.step] || renderAsk)();
+}
+
+function renderAsk(){
+  app.innerHTML = `
+    <div class="page active enter">
+      <div class="eyebrow">یه سوال کوچیک</div>
+      <h1 class="hero">${PARTNER_NAME ? PARTNER_NAME + ' جان، ' : ''}با من میای سر قرار؟ 🥺</h1>
+      <p class="sub">فقط یک سؤال ساده‌ست... جوابش فقط یکیه 🤍</p>
+      <div class="btn-row">
+        <button id="yesBtn" class="btn btn-yes">❤️ آره</button>
+        <button id="noBtn" class="btn btn-no">💔 نه</button>
+      </div>
+      <div id="taunt" class="taunt"></div>
+    </div>`;
+  const yesBtn = document.getElementById('yesBtn');
+  const noBtn = document.getElementById('noBtn');
+  const taunt = document.getElementById('taunt');
+
+  applyStageStyles(yesBtn, noBtn);
+  if(state.noStage>0 && state.noStage<=CONFIG.maxNoStage){
+    taunt.innerHTML = CONFIG.taunts[state.noStage-1];
+    taunt.classList.add('show');
+  }
+
+  yesBtn.addEventListener('click', (e)=>{
+    ripple(e, yesBtn);
+    setTimeout(()=> goTo('date'), 220);
+  });
+
+  noBtn.addEventListener('click', (e)=>{
+    if(state.noStage >= CONFIG.maxNoStage) return;
+    ripple(e, noBtn);
+    state.noStage++;
+    persistState();
+    applyStageStyles(yesBtn, noBtn);
+    taunt.classList.remove('show'); void taunt.offsetWidth;
+    taunt.innerHTML = CONFIG.taunts[state.noStage-1];
+    taunt.classList.add('show');
+    if(state.noStage>=CONFIG.maxNoStage) setTimeout(()=>{ noBtn.style.display='none'; }, 380);
+  });
+}
+
+const BASE_YES = { font:20, padX:40, padY:16 };
+const BASE_NO  = { font:16, padX:26, padY:12 };
+function applyStageStyles(yesBtn, noBtn){
+  const yesGrow = 1 + state.noStage * 0.22;
+  const noShrink = Math.max(1 - state.noStage * 0.22, 0.18);
+  yesBtn.style.fontSize = (BASE_YES.font*yesGrow).toFixed(1)+'px';
+  yesBtn.style.padding = (BASE_YES.padY*yesGrow).toFixed(1)+'px '+(BASE_YES.padX*yesGrow).toFixed(1)+'px';
+  noBtn.style.fontSize = (BASE_NO.font*noShrink).toFixed(1)+'px';
+  noBtn.style.padding = (BASE_NO.padY*noShrink).toFixed(1)+'px '+(BASE_NO.padX*noShrink).toFixed(1)+'px';
+  noBtn.style.opacity = state.noStage >= CONFIG.maxNoStage-1 ? Math.max(0, 1-(state.noStage-(CONFIG.maxNoStage-2))*0.5) : 1;
+  if(state.noStage >= CONFIG.maxNoStage){ noBtn.style.opacity=0; noBtn.style.pointerEvents='none'; }
+}
+
+function stepDots(activeCount, total){
+  let html = '<div class="dots">';
+  for(let i=0;i<total;i++) html += `<div class="dot ${i<activeCount?'active':''}"></div>`;
+  html += '</div>';
+  return html;
+}
+
+function renderDate(){
+  app.innerHTML = `
+    <div class="page active enter">
+      ${stepDots(1,5)}
+      <h1 class="hero" style="font-size:clamp(24px,6vw,38px)">عالیه ❤️</h1>
+      <p class="sub">اول بگو چه روزی قرار بذاریم؟</p>
+      <div class="glass-card">
+        <div class="field">
+          <label>📅 انتخاب تاریخ</label>
+          <input type="date" id="dateInput" value="${state.date}" />
+        </div>
+        <button id="contBtn" class="btn-continue" ${!state.date?'disabled':''}>ادامه ➜</button>
+      </div>
+    </div>`;
+  const dateInput = document.getElementById('dateInput');
+  const contBtn = document.getElementById('contBtn');
+  dateInput.addEventListener('input', ()=>{ state.date = dateInput.value; contBtn.disabled = !state.date; });
+  contBtn.addEventListener('click', ()=>{ if(!contBtn.disabled) goTo('time'); });
+}
+
+function renderTime(){
+  app.innerHTML = `
+    <div class="page active enter">
+      ${stepDots(2,5)}
+      <h1 class="hero" style="font-size:clamp(24px,6vw,38px)">چه ساعتی؟ 🕒</h1>
+      <p class="sub">ساعت قرارمون رو مشخص کن.</p>
+      <div class="glass-card">
+        <div class="field">
+          <label>🕒 انتخاب ساعت</label>
+          <input type="time" id="timeInput" value="${state.time}" />
+        </div>
+        <button id="contBtn" class="btn-continue" ${!state.time?'disabled':''}>ادامه ➜</button>
+      </div>
+    </div>`;
+  const timeInput = document.getElementById('timeInput');
+  const contBtn = document.getElementById('contBtn');
+  timeInput.addEventListener('input', ()=>{ state.time = timeInput.value; contBtn.disabled = !state.time; });
+  contBtn.addEventListener('click', ()=>{ if(!contBtn.disabled) goTo('activity'); });
+}
+
+function renderActivity(){
+  app.innerHTML = `
+    <div class="page active enter">
+      ${stepDots(3,5)}
+      <h1 class="hero" style="font-size:clamp(22px,5.5vw,34px)">دوست داری قرارمون چجوری باشه؟ 🩷</h1>
+      <div class="option-grid" id="grid"></div>
+      <button id="contBtn" class="btn-final" ${!state.activityId?'disabled':''}>ادامه ➜</button>
+    </div>`;
+  const grid = document.getElementById('grid');
+  const contBtn = document.getElementById('contBtn');
+  CONFIG.ACTIVITIES.forEach(a=>{
+    const card = document.createElement('div');
+    card.className='option-card' + (state.activityId===a.id ? ' selected':'');
+    card.innerHTML = `<div class="check-badge">✓</div><div class="option-emoji">${a.emoji}</div><div class="option-name">${a.label}</div><div class="option-desc">${a.desc||''}</div>`;
+    card.addEventListener('click', ()=>{
+      state.activityId = a.id;
+      if(!(a.id===state.activityId)) state.subChoice = null;
+      [...grid.children].forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      contBtn.disabled = false;
+    });
+    grid.appendChild(card);
+  });
+  contBtn.addEventListener('click', ()=>{
+    if(contBtn.disabled) return;
+    const activity = getActivity();
+    if(activity.sub){ state.subChoice = null; goTo('sub'); }
+    else { finalizeAndGo(); }
+  });
+}
+
+function renderSub(){
+  const activity = getActivity();
+  if(!activity || !activity.sub){ goTo('final'); return; }
+  app.innerHTML = `
+    <div class="page active enter">
+      ${stepDots(4,5)}
+      <h1 class="hero" style="font-size:clamp(22px,5.5vw,32px)">${activity.sub.title}</h1>
+      <div class="option-grid" id="grid"></div>
+      <button id="contBtn" class="btn-final" ${!state.subChoice?'disabled':''}>❤️ بزن بریم</button>
+    </div>`;
+  const grid = document.getElementById('grid');
+  const contBtn = document.getElementById('contBtn');
+  activity.sub.options.forEach(opt=>{
+    const card = document.createElement('div');
+    const isSel = state.subChoice && state.subChoice.label===opt.label;
+    card.className='option-card' + (isSel ? ' selected':'');
+    card.innerHTML = `<div class="check-badge">✓</div><div class="option-emoji">${opt.emoji}</div><div class="option-name">${opt.label}</div>`;
+    card.addEventListener('click', ()=>{
+      state.subChoice = opt;
+      [...grid.children].forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      contBtn.disabled = false;
+    });
+    grid.appendChild(card);
+  });
+  contBtn.addEventListener('click', ()=>{ if(!contBtn.disabled) finalizeAndGo(); });
+}
+
+function finalizeAndGo(){
+  goTo('final');
+  persistShared();
+  launchConfetti();
+  sendTelegramNotification();
+}
+
+function carSvg(){
+  return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 160'>
+    <ellipse cx='150' cy='140' rx='120' ry='10' fill='#f3c9d9'/>
+    <path d='M40 110 Q40 70 90 65 L110 40 Q120 30 140 30 L190 30 Q205 30 215 45 L235 65 Q270 68 270 105 Q270 118 255 118 L55 118 Q40 118 40 110 Z' fill='#ff8fb8' stroke='#e0568f' stroke-width='3'/>
+    <path d='M120 45 L135 65 L185 65 L200 45 Q195 40 190 40 L130 40 Q125 40 120 45 Z' fill='#ffe3ee'/>
+    <circle cx='95' cy='118' r='22' fill='#4a2b3a'/><circle cx='95' cy='118' r='10' fill='#e0ac9d'/>
+    <circle cx='215' cy='118' r='22' fill='#4a2b3a'/><circle cx='215' cy='118' r='10' fill='#e0ac9d'/>
+    <circle cx='250' cy='85' r='6' fill='#fff6da'/>
+    <text x='150' y='95' font-size='20' text-anchor='middle'>💕</text>
+  </svg>`;
+}
+
+function renderFinal(){
+  const activity = getActivity();
+  const phrase = activity ? activity.finalPhrase(state.subChoice) : '';
+  app.innerHTML = `
+    <div class="page active enter">
+      <div style="font-size:52px;margin-bottom:6px;">🎉</div>
+      <h1 class="hero" style="font-size:clamp(24px,6vw,36px)">خوشحالم که نه نگفتی! ❤️</h1>
+      <div class="result-box">
+        <p>پس من</p>
+        <p><span class="result-highlight">${formatDateWithWeekday(state.date)}</span> ساعت <span class="result-highlight">${toPersianDigits(state.time)}</span></p>
+        <p>${phrase}</p>
+      </div>
+      <p class="sub" style="margin-top:22px;">پس آماده باش...<br>خودم میام دنبالت 🚗💕</p>
+      ${NOTIFY_EMAIL ? `<button id="notifyBtn" class="btn-continue" style="max-width:280px;">📩 اطلاع بده (ایمیل)</button>` : ''}
+      ${NOTIFY_PHONE ? `<button id="smsBtn" class="btn-continue" style="max-width:280px; margin-top:10px;">💬 اطلاع بده (پیامک)</button>` : ''}
+      <img class="car-img" alt="ماشین کارتونی صورتی" src="data:image/svg+xml;utf8,${encodeURIComponent(carSvg())}" />
+      <div class="final-actions">
+        <button id="restartBtn" class="btn-ghost">🔄 از اول شروع کنیم</button>
+        <button id="newDateBtn" class="btn-ghost">🩷 یک قرار جدید بچینیم</button>
+        <button id="homeBtn2" class="btn-ghost">🏠 بازگشت به خانه</button>
+      </div>
+    </div>`;
+  if(NOTIFY_EMAIL){
+    document.getElementById('notifyBtn').addEventListener('click', ()=>{
+      const subject = encodeURIComponent('جواب قرار ❤️');
+      const body = encodeURIComponent(`آره گفتم! 🎉\n${formatDateWithWeekday(state.date)} ساعت ${state.time}\n${phrase}`);
+      window.location.href = `mailto:${NOTIFY_EMAIL}?subject=${subject}&body=${body}`;
+    });
+  }
+  if(NOTIFY_PHONE){
+    document.getElementById('smsBtn').addEventListener('click', ()=>{
+      const msg = encodeURIComponent(`آره گفتم! 🎉 ${formatDateWithWeekday(state.date)} ساعت ${toPersianDigits(state.time)} - ${phrase}`);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      window.location.href = isIOS ? `sms:${NOTIFY_PHONE}&body=${msg}` : `sms:${NOTIFY_PHONE}?body=${msg}`;
+    });
+  }
+  document.getElementById('restartBtn').addEventListener('click', fullReset);
+  document.getElementById('newDateBtn').addEventListener('click', newDateKeepYes);
+  document.getElementById('homeBtn2').addEventListener('click', ()=>{
+    showModal({ text:'اگر به صفحه اصلی برگردی، اطلاعات این قرار پاک می‌شه. مطمئنی؟', confirmLabel:'بازگشت به خانه', onConfirm: fullReset });
+  });
+}
+
+/* ---------------- Admin view: ?admin=1 ---------------- */
+async function maybeRenderAdmin(){
+  const params = new URLSearchParams(location.search);
+  if(params.get('admin')!=='1') return false;
+  let rows = [];
+  if(window.storage){
+    try{
+      const listRes = await window.storage.list('response:', true);
+      if(listRes && listRes.keys){
+        for(const k of listRes.keys){
+          try{ const r = await window.storage.get(k, true); if(r && r.value) rows.push(JSON.parse(r.value)); }catch(e){}
+        }
+      }
+    }catch(e){}
+  }
+  const localRaw = localStorage.getItem(CONFIG.storageKey);
+  if(localRaw){ try{ rows.push({...JSON.parse(localRaw), source:'این دستگاه'}); }catch(e){} }
+  const tableRows = rows.map(r=>`<tr><td>${r.date?formatDateFull(r.date):'-'}</td><td>${r.time||'-'}</td><td>${(r.activity||'-')}</td><td>${r.sub||'-'}</td></tr>`).join('');
+  document.getElementById('app').innerHTML = `
+    <div class="admin-panel">
+      <h1 class="hero" style="font-size:26px;">پاسخ‌های ثبت‌شده</h1>
+      <p class="sub">این صفحه فقط برای توئه؛ لینک اصلی رو بدون ?admin=1 برای طرف مقابل بفرست.</p>
+      <table><tr><th>تاریخ</th><th>ساعت</th><th>فعالیت</th><th>جزئیات</th></tr>
+      ${tableRows || '<tr><td colspan="4">هنوز پاسخی ثبت نشده</td></tr>'}</table>
+    </div>`;
+  return true;
+}
+
+(async function init(){
+  await restoreState();
+  const isAdmin = await maybeRenderAdmin();
+  if(!isAdmin) render();
+})();
+</script>
+</body>
+</html>
